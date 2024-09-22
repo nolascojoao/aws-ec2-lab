@@ -260,11 +260,21 @@ aws ec2 modify-instance-attribute --instance-ids <instance-id> --no-disable-api-
   <img src="screenshot/5.2.PNG"/>
 </div>
 
-### 5.3 Terminate the instance
+### 5.3 Terminate the Instance
 Terminate the instance again:
 
 ```bash
 aws ec2 terminate-instances --instance-ids <instance-id>
+```
+
+### 5.4 Verify the Instance Status
+Check if the instance has been terminated:
+
+```bash
+aws ec2 describe-instances \
+	--instance-ids <instance-id> \
+	--query 'Reservations[*].Instances[*].[InstanceId,State.Name]' \
+	--output table
 ```
 
 <div align="center">
@@ -276,5 +286,3 @@ aws ec2 terminate-instances --instance-ids <instance-id>
 ## Conclusion
 
 Understanding AWS CLI is fundamental for creating Bash scripts that reduce boilerplate code and typos, accelerate architecture deployment, and provide code reuse. For more details, refer to the [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2) and [AWS CLI Documentation](https://docs.aws.amazon.com/cli).
-
-
