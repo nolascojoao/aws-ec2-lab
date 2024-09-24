@@ -4,25 +4,31 @@
   <img src="screenshot/Cloud Architecture.png" width="280"/>
 </div>
 
+## Overview
+
 This lab provides a guide to:
-- Launching an Amazon EC2 instance with an Apache Web Server
-- Monitoring the CPU performance of the EC2 instance
-- Resizing the EC2 instance for scaling
-- Testing termination protection
-- Terminating the instance
+
+- **Launching an EC2 Instance**: Create an Amazon EC2 instance with an Apache Web Server.
+
+- **Checking Web Server Access**: Ensure the web server is reachable via its public IP.
+
+- **Monitoring Instance Performance**: Track CPU usage with CloudWatch.
+
+- **Resizing EC2 Resources**: Change the instance type and adjust the EBS volume size.
+
+- **Testing and Terminating the Instance**: Test termination protection and then safely terminate the instance.
+
 ---  
 ⚠️ **Attention**: 
-1. All the tasks will be completed via the command line using AWS CLI, so you need to have the necessary access permissions. [AWS CLI Install](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-2. Please be aware that charges may apply while completing this lab. [AWS Pricing](https://aws.amazon.com/pricing/)
+- All the tasks will be completed via the command line using AWS CLI. Ensure you have the necessary permissions. [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- Charges may apply for completing this lab. [AWS Pricing](https://aws.amazon.com/pricing/)
 
 ---
 
+## Task 1 - Launch and Configure Your EC2 Instance
 
-## Task 1 - Launch an EC2 Instance
-
-### 1.1 Create the EC2 instance
-To launch an EC2 instance with an Apache web server:
-
+#### 1.1 Create the EC2 instance
+Replace `<ami-0ebfd941bbafe70c6>` with the AMI of your choice and `t2.micro` with your preferred instance type
 ```bash
 aws ec2 run-instances \
 	--image-id ami-0ebfd941bbafe70c6 \
@@ -31,7 +37,6 @@ aws ec2 run-instances \
 	--user-data file://user-data.sh \
 	--instance-initiated-shutdown-behavior stop
 ```
-
 *user-data.sh*
 ```bash
 #!/bin/bash
@@ -51,27 +56,24 @@ echo '<html><h1>Hello From Your Web Server!</h1></html>' > /var/www/html/index.h
 
 ---
 ⚠️ **Attention**:  
-1. We are omitting the VPC and Security Group selection. If omitted, they will be automatically set to DEFAULT.  
-2. `ami-0ebfd941bbafe70c6` is currently the Amazon Linux 2023 AMI. Consult the [AWS AMI documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) for more details.  
-3. Set the path for the `user-data` file according to your operating system:
-   - For **Windows**, use a path like: `--user-data file://C:/path/to/your/file.sh`
-   - For **Linux**, use a path like: `--user-data file:///home/username/path/to/your/file.sh`
-   Replace `path/to/your/file.sh` with the actual path to your `user-data` file, and adjust `username` as needed.
-4. We will not log into our EC2 instance in this lab, so we are not creating a key pair.
-5. After launching the instance, copy the instance ID for the subsequent steps.
+- Default VPC and Security Groups will be used if omitted.  
+- Replace ami-0ebfd941bbafe70c6 if needed. [Find an AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) 
+- Adjust the user-data path for your OS:
+   - Windows: --user-data file://C:/path/to/file.sh
+   - Linux: --user-data file:///home/username/path/to/file.sh
+- No key pair will be created as login is not required.
+- Copy the instance ID for later use.
 
 ---
 
-### 1.2 Enable Termination Protection
-Enable termination protection:
-
+#### 1.2 Enable Termination Protection
+Replace `<instance-id>` with the ID of your EC2 instance:
 ```bash
 aws ec2 modify-instance-attribute --instance-ids <instance-id> --disable-api-termination
 ```
 
-### 1.3 Check Termination Protection Status
-Verify if Termination Protection is enabled:
-
+#### 1.3 Check Termination Protection Status
+Replace `<instance-id>` with the ID of your EC2 instance:
 ```bash
 aws ec2 describe-instance-attribute \
 	--instance-ids <instance-id> \
@@ -83,24 +85,10 @@ aws ec2 describe-instance-attribute \
 
 ---
 
-| Command                           | Description                                                       |
-|-----------------------------------|-------------------------------------------------------------------|
-| `run-instances`                   | Launches a new instance.                                         |
-| `--image-id`                      | Specifies the AMI (e.g., `ami-0ebfd941bbafe70c6`).              |
-| `--instance-type`                 | Sets the instance type (e.g., `t2.micro`).                       |
-| `--associate-public-ip-address`   | Assigns a public IP address to the instance.                     |
-| `--user-data`                     | Provides a script to configure the web server.                  |
-| `--instance-initiated-shutdown-behavior stop` | Keeps the instance from terminating when shut down.       |
-| `modify-instance-attribute`       | Changes settings for an existing EC2 instance.                   |
-| `--instance-ids <instance-id>`    | Identifies the instance to modify. Replace `<instance-id>` with the instance ID. |
-| `--disable-api-termination`       | Enables termination protection.                                   |
-| `--attribute disableApiTermination`| Shows the termination protection status for the EC2 instance.    |
+## Task 2 - Verify Web Server Accessibility
 
-
-## Task 2 - Check the Web Page
-
-### 2.1 Retrieve the security group ID:
-
+#### 2.1 Retrieve the security group ID:
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 describe-instances \
 	--instance-ids <instance-id> \
@@ -108,8 +96,8 @@ aws ec2 describe-instances \
 	--output table
 ```
 
-### 2.2 Add inbound rules to allow HTTP traffic to the security group:
-
+#### 2.2 Add inbound rules to allow HTTP traffic to the security group:
+Replace `<sg-xxxxxxxx>` with your Security Group ID
 ```bash
 aws ec2 authorize-security-group-ingress \
 	--group-id sg-xxxxxxxx \
@@ -121,8 +109,8 @@ aws ec2 authorize-security-group-ingress \
   <img src="screenshot/2.0.PNG"/>
 </div>
 
-### 2.3 Retrieve the public IPv4 address:
-
+#### 2.3 Retrieve the public IPv4 address:
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 describe-instances \
 	--instance-ids <instance-id> \
@@ -132,7 +120,7 @@ aws ec2 describe-instances \
   <img src="screenshot/2.1.PNG"/>
 </div>
 
-### 2.4 Access the public IP in your browser to check if the page is working.
+#### 2.4 Access the public IP in your browser to check if the page is working.
 
 <div align="center">
   <img src="screenshot/2.2.PNG"/>
@@ -140,25 +128,10 @@ aws ec2 describe-instances \
 
 ---
 
-| Command                                               | Description                                                        |
-|------------------------------------------------------|--------------------------------------------------------------------|
-| `describe-instances`                                 | Retrieves information about one or more EC2 instances.            |
-| `--instance-ids <instance-id>`                       | Specifies the ID of the instance to query. Replace `<instance-id>` with the instance ID. |
-| `--query 'Reservations[*].Instances[*].PublicIpAddress'` | Filters the output to show only the public IPv4 address of the instance. |
-| `--query 'Reservations[*].Instances[*].SecurityGroups'` | Filters the security group info associated with the EC2 instance. |
-| `--output table`                                     | Formats the output in a table for easier readability.             |
-| `authorize-security-group-ingress`                   | Allows incoming traffic to a security group.                       |
-| `--group-id sg-xxxxxxxx`                             | Specifies the security group to modify. Replace `sg-xxxxxxxx` with the group ID. |
-| `--protocol tcp`                                     | Specifies the TCP protocol for the rule.                          |
-| `--port 80`                                         | Opens port 80 (HTTP).                                             |
-| `--cidr 0.0.0.0/0`                                  | Allows incoming traffic from any IP address (all IP ranges).      |
+## Task 3 - Monitor EC2 Instance Performance
 
-
-## Task 3 - Monitor the EC2 Instance
-
-### 3.1 Enable Basic Monitoring with CloudWatch
-To enable basic monitoring of the EC2 instance with CloudWatch:
-
+#### 3.1 Enable Basic Monitoring with CloudWatch
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 monitor-instances --instance-ids <instance-id>
 ```
@@ -166,9 +139,8 @@ aws ec2 monitor-instances --instance-ids <instance-id>
   <img src="screenshot/3.1.PNG"/>
 </div>
 
-### 3.2 Check the EC2 Monitoring Data
-To view the instance metrics in CloudWatch:
-
+#### 3.2 Check the EC2 Monitoring Data
+Replace `<start-time>`, `<end-time>`, and `<instance-id>` with the appropriate values for your EC2 instance
 ```bash
 aws cloudwatch get-metric-statistics \
 --namespace AWS/EC2 \
@@ -185,38 +157,22 @@ aws cloudwatch get-metric-statistics \
 
 ---
 
-| Command                                                 | Description                                                        |
-|--------------------------------------------------------|--------------------------------------------------------------------|
-| `monitor-instances`                                   | Enables monitoring for the EC2 instance. Replace `<instance-id>` with instance ID. |
-| `get-metric-statistics`                               | Retrieves metric statistics from Amazon CloudWatch.                |
-| `--namespace AWS/EC2`                                 | Queries metrics related to Amazon EC2.                             |
-| `--metric-name CPUUtilization`                         | Requests the CPU utilization metric.                                |
-| `--start-time <start-time>`                           | Sets the start time for the metric data (in UTC).                 |
-| `--end-time <end-time>`                               | Sets the end time for the metric data (in UTC).                   |
-| `--period 300`                                       | Defines the data granularity in seconds (300 seconds = 5 minutes). |
-| `--statistics Average`                                 | Requests the average CPU utilization for the specified period.     |
-| `--dimensions Name=InstanceId,Value=<instance-id>`    | Identifies the specific instance for which to retrieve metrics. Replace `<instance-id>` with your instance ID. |
+## Task 4 - Scale and Modify Your EC2 Resources
 
-
-## Task 4 - Change instance type and EBS volume
-
-### 4.1 Stop Instance
-Stop the specified EC2 instance by providing its instance ID:
-
+#### 4.1 Stop Instance
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 stop-instances --instance-ids <instance-id>
 ```
 
-### 4.2 Change the Instance Type 
-To change the instance type from t2.micro to t3.nano:
-
+#### 4.2 Change the Instance Type 
+Replace `<instance-id>` with the ID of your EC2 instance and `t3.nano` with your desired instance type
 ```bash
 aws ec2 modify-instance-attribute --instance-ids <instance-id> --instance-type "t3.nano"
 ```
 
-### 4.3 Retrieve the EBS volume ID:
-To retrieve the EBS volume ID attached to the EC2 instance:
-
+#### 4.3 Retrieve the EBS volume ID:
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 authorize-security-group-ingress \
 	--instance-ids <instance-id> \
@@ -224,56 +180,56 @@ aws ec2 authorize-security-group-ingress \
 	--output table
 ```
 
-### 4.4 Modify the EBS volume
-To increase the EBS volume size from 8GB to 10GB:
-
+#### 4.4 Modify the EBS volume
+Replace `<volume-id>` with the ID of the EBS volume you want to modify
 ```bash
 aws ec2 modify-volume --volume-id <volume-id> --size 10
 ```
 
 ### 4.5 Start Instance
-Start the specified EC2 instance by providing its instance ID:
-
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 start-instances --instance-ids <instance-id>
 ```
+
 <div align="center">
   <img src="screenshot/4.1.PNG"/>
 </div>
 
-## Task 5 - Test Termination Protection
+---
 
-### 5.1 Test Termination Protection
-Terminate the instance to test termination protection:
+## Task 5 - Manage Termination Protection and Cleanup
 
+#### 5.1 Test Termination Protection
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 terminate-instances --instance-ids <instance-id>
 ```
+
 This will fail if termination protection is enabled.
+
 <div align="center">
   <img src="screenshot/5.1.PNG"/>
 </div>
 
-### 5.2 Disable Termination Protection
-Disable termination protection:
-
+#### 5.2 Disable Termination Protection
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 modify-instance-attribute --instance-ids <instance-id> --no-disable-api-termination
 ```
+
 <div align="center">
   <img src="screenshot/5.2.PNG"/>
 </div>
 
-### 5.3 Terminate the Instance
-Terminate the instance again:
-
+#### 5.3 Terminate the Instance
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 terminate-instances --instance-ids <instance-id>
 ```
 
-### 5.4 Verify the Instance Status
-Check if the instance has been terminated:
-
+#### 5.4 Verify the Instance Status
+Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 describe-instances \
 	--instance-ids <instance-id> \
