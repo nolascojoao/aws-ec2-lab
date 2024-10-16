@@ -22,6 +22,7 @@ This lab provides a guide to:
 ⚠️ **Attention**: 
 - All the tasks will be completed via the command line using AWS CLI. Ensure you have the necessary permissions. [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - Charges may apply for completing this lab. [AWS Pricing](https://aws.amazon.com/pricing/)
+- For this lab, it is assumed that you already have a **DEFAULT VPC** created.
 
 ---
 
@@ -37,6 +38,19 @@ aws ec2 run-instances \
 	--user-data file://user-data.sh \
 	--instance-initiated-shutdown-behavior stop
 ```
+
+---
+⚠️ **Attention**:  
+- Default VPC and Security Groups will be used if omitted.  
+- Replace ami-0ebfd941bbafe70c6 if needed. [Find an AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) 
+- Adjust the user-data path for your OS:
+   - Windows: --user-data file://C:/path/to/file.sh
+   - Linux: --user-data file:///home/username/path/to/file.sh
+- No key pair will be created as login is not required.
+- Copy the instance ID for later use.
+
+---
+
 *user-data.sh*
 ```bash
 #!/bin/bash
@@ -53,16 +67,6 @@ echo '<html><h1>Hello From Your Web Server!</h1></html>' > /var/www/html/index.h
 <div align="center">
   <img src="screenshot/1.1.PNG"/>
 </div>
-
----
-⚠️ **Attention**:  
-- Default VPC and Security Groups will be used if omitted.  
-- Replace ami-0ebfd941bbafe70c6 if needed. [Find an AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) 
-- Adjust the user-data path for your OS:
-   - Windows: --user-data file://C:/path/to/file.sh
-   - Linux: --user-data file:///home/username/path/to/file.sh
-- No key pair will be created as login is not required.
-- Copy the instance ID for later use.
 
 ---
 
@@ -100,7 +104,7 @@ aws ec2 describe-instances \
 Replace `<sg-xxxxxxxx>` with your Security Group ID
 ```bash
 aws ec2 authorize-security-group-ingress \
-	--group-id sg-xxxxxxxx \
+	--group-id <sg-xxxxxxxx> \
 	--protocol tcp \
 	--port 80 \
 	--cidr 0.0.0.0/0
@@ -245,4 +249,4 @@ aws ec2 describe-instances \
 
 ## Conclusion
 
-Understanding AWS CLI is fundamental for creating Bash scripts that reduce boilerplate code and typos, accelerate architecture deployment, and provide code reuse. For more details, refer to the [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2) and [AWS CLI Documentation](https://docs.aws.amazon.com/cli).
+Understanding AWS CLI is fundamental for creating ![Bash scripts](/bash) that reduce boilerplate code and typos, accelerate architecture deployment, and provide code reuse. For more details, refer to the [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2) and [AWS CLI Documentation](https://docs.aws.amazon.com/cli).
