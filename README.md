@@ -73,14 +73,14 @@ echo '<html><h1>Hello From Your Web Server!</h1></html>' > /var/www/html/index.h
 #### 1.2 Enable Termination Protection
 Replace `<instance-id>` with the ID of your EC2 instance:
 ```bash
-aws ec2 modify-instance-attribute --instance-ids <instance-id> --disable-api-termination
+aws ec2 modify-instance-attribute --instance-id <instance-id> --disable-api-termination
 ```
 
 #### 1.3 Check Termination Protection Status
 Replace `<instance-id>` with the ID of your EC2 instance:
 ```bash
 aws ec2 describe-instance-attribute \
-	--instance-ids <instance-id> \
+	--instance-id <instance-id> \
 	--attribute disableApiTermination
 ```
 <div align="center">
@@ -95,7 +95,7 @@ aws ec2 describe-instance-attribute \
 Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 describe-instances \
-	--instance-ids <instance-id> \
+	--instance-id <instance-id> \
 	--query 'Reservations[*].Instances[*].SecurityGroups' \
 	--output table
 ```
@@ -172,14 +172,14 @@ aws ec2 stop-instances --instance-ids <instance-id>
 #### 4.2 Change the Instance Type 
 Replace `<instance-id>` with the ID of your EC2 instance and `t3.nano` with your desired instance type
 ```bash
-aws ec2 modify-instance-attribute --instance-ids <instance-id> --instance-type "t3.nano"
+aws ec2 modify-instance-attribute --instance-id <instance-id> --instance-type "t3.nano"
 ```
 
 #### 4.3 Retrieve the EBS volume ID:
 Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 authorize-security-group-ingress \
-	--instance-ids <instance-id> \
+	--instance-id <instance-id> \
 	--query 'Reservations[*].Instances[*].BlockDeviceMappings[*].[Ebs.VolumeId]' \
 	--output table
 ```
@@ -219,7 +219,7 @@ This will fail if termination protection is enabled.
 #### 5.2 Disable Termination Protection
 Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
-aws ec2 modify-instance-attribute --instance-ids <instance-id> --no-disable-api-termination
+aws ec2 modify-instance-attribute --instance-id <instance-id> --no-disable-api-termination
 ```
 
 <div align="center">
@@ -236,7 +236,7 @@ aws ec2 terminate-instances --instance-ids <instance-id>
 Replace `<instance-id>` with the ID of your EC2 instance
 ```bash
 aws ec2 describe-instances \
-	--instance-ids <instance-id> \
+	--instance-id <instance-id> \
 	--query 'Reservations[*].Instances[*].[InstanceId,State.Name]' \
 	--output table
 ```
