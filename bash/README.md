@@ -19,7 +19,7 @@ Please run the scripts in the following order:
 
 2. **Authorize Security Group**
 ```bash
-Task-2-authorize-security-group.sh
+./Task-2-authorize-security-group.sh
 ```
 
 <div align="center">
@@ -30,7 +30,7 @@ Task-2-authorize-security-group.sh
 
 3. **Monitor EC2 Instance Performance**
 ```bash
-Task-3-monitor-ec2-instance.sh
+./Task-3-monitor-ec2-instance.sh
 ```
 
 <div align="center">
@@ -41,7 +41,7 @@ Task-3-monitor-ec2-instance.sh
 
 4. **Scale and Modify Your EC2 Resources**
 ```bash
-Task-4-modify-ec2-resources.sh
+./Task-4-modify-ec2-resources.sh
 ```
 
 <div align="center">
@@ -52,7 +52,7 @@ Task-4-modify-ec2-resources.sh
 
 5. **Manage Termination Protection and Cleanup**
 ```bash
-Task-5-disable-termination-protection.sh
+./Task-5-disable-termination-protection.sh
 ```
 
 <div align="center">
